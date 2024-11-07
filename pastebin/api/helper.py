@@ -22,6 +22,9 @@ def display_relative_time(start_time, end_time):
 def datetime_from_string(datetime_str):
     return datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f%z")
 
+def datetime_to_string(datetime_dt):
+    return datetime_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+
 def get_file_size(file_path):
     file_size = os.path.getsize(file_path)
     if file_size < 1024:

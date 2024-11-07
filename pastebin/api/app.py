@@ -5,7 +5,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import datetime
 from base62 import encode, decode
-from helper import display_relative_time, datetime_from_string, get_file_size
+from helper import display_relative_time, datetime_to_string, get_file_size
 
 load_dotenv()
 
@@ -89,13 +89,27 @@ def create():
 
     return jsonify(shortlink=shortlink, status=200)
 
+@app.route('/detail/<shortlink>')
+def shortlink(shortlink):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    id = decode(shortlink)
+    cur.execute(
+        'SELECT created_at, pastepath, expiration FROM pastes WHERE id=%s;',(id, )
+    )
 
+    created_at, pastepath, expiration = cur.fetchall()[0]
+    conn.close()
+    cur.close()
 
+    expired_at = datetime_to_string(datetime.timedelta(minutes=expiration) + created_at)
+
+    with open(pastepath,'r') as f:
+        context = f.read()
     
-
-
-    
-
-
-
+    return jsonify(
+        expiration = expired_at,
+        context = context, 
+        size = get_file_size(pastepath)
+    )
 
