@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from flask import Flask, request, Response
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import datetime
@@ -80,7 +80,7 @@ def create():
     cur.close()
     conn.close()
 
-    return Response(status=200)
+    return jsonify(shortlink=shortlink, status=200)
 
 
 
