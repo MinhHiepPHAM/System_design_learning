@@ -1,6 +1,7 @@
 import './App.css'
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import Home from './Home'
+import ShortLink from './ShortLink'
 import {DEFAULT_THEME, MantineProvider, createTheme, mergeThemeOverrides } from '@mantine/core';
 
 // Import styles of packages that you've installed.
@@ -27,6 +28,7 @@ function App() {
 					<main>
 						<Routes>
 							<Route path="/" element={<Home/>} />
+                            <Route path="/detail/:shortlink" element={<ShortLink/>} />
 						</Routes>
 					</main>
 				</div>

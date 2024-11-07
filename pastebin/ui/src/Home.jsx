@@ -38,7 +38,7 @@ function Home() {
 
     const displayLinks = (<List mt='xl'>{
         linkInfos.map((info,i) => (
-            <List.Item key={i}><a href={`/${info.link}`}>{info.link}, created at {info.created}, size={info.size}</a></List.Item>
+            <List.Item key={i}><a href={`/detail/${info.link}`}>{info.link}, created at {info.created}, size={info.size}</a></List.Item>
         ))        
     }</List>);
 
@@ -70,11 +70,10 @@ function Home() {
         </Flex>
     );
     
-    // console.log('paste:', paste, expiration)
 
     return( 
     <>
-        <Title c='blue' order={2}>Pastebin</Title>
+        <a href='/'><Title c='blue' order={2}>Pastebin</Title></a>
         <Textarea
             label='New paste' required
             placeholder='Type the context you want to paste'
