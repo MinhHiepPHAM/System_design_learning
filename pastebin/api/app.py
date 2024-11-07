@@ -5,7 +5,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import datetime
 from base62 import encode, decode
-
+from helper import display_relative_time, datetime_from_string, get_file_size
 
 load_dotenv()
 
@@ -27,15 +27,22 @@ def get_db_connection():
 def index():
     conn = get_db_connection()
     cur = conn.cursor()
-    # get 10 recent links
+    # get recent links
     cur.execute(
-        'SELECT shortlink, created_at FROM pastes ORDER BY created_at ASC LIMIT 10;'
+        'SELECT shortlink, created_at, pastepath FROM pastes ORDER BY id DESC LIMIT 20;'
     )
 
+
     recent_links = cur.fetchall()
+    cur.close()
+    conn.close()
     return [
-        {'shortlink': shortlink, 'created_at': created_at}
-        for shortlink, created_at in recent_links   
+        {
+            'shortlink': shortlink,
+            'created_at': display_relative_time(created_at, datetime.datetime.now(datetime.timezone.utc)),
+            'size': get_file_size(pastepath)
+        }
+        for shortlink, created_at, pastepath in recent_links   
     ]
 
 @app.route('/create/', methods=('POST',))

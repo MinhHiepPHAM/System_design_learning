@@ -20,24 +20,31 @@ function Home() {
     const [paste, setPaste] = useState('');
     const [expiration, setExpiration] = useState(0);
     const [shortlink, setShortlink] = useState('');
+    const [linkInfos, setLinkInfos] = useState([]);
 
-    const links = [
-        {'link': 'aaaaaaab', 'created':'1 min ago', 'size':'15KB'},
-        {'link': 'aaaa5Dab', 'created':'2 min ago', 'size':'07KB'},
-        {'link': 'aaaa12ab', 'created':'5 min ago', 'size':'10KB'},
-    ]
+    useEffect(() => {
+        async function fetchData() {
+            const response = await axios.get('/', {headers:headers});
+            setLinkInfos(
+                response.data.map(item => (
+                    {'link': item.shortlink, 'created': item.created_at, 'size': item.size}
+                ))
+            ) 
+        }
 
-    const linkInfos = (<List mt='xl'>{
-        links.map((info,i) => (
-            <List.Item key={i}>{info.link} created at {info.created} with size={info.size}</List.Item>
+        fetchData();
+
+    },[shortlink]);
+
+    const displayLinks = (<List mt='xl'>{
+        linkInfos.map((info,i) => (
+            <List.Item key={i}><a href={`/${info.link}`}>{info.link}, created at {info.created}, size={info.size}</a></List.Item>
         ))        
     }</List>);
 
-
+    const headers = {'Content-Type': 'application/json'};
 
     const handleSubmitButton = async (e) => {
-        const headers = {'Content-Type': 'application/json'};
-        
         const response = await axios.post(`/create/`, {
             paste,
             expiration
@@ -91,7 +98,7 @@ function Home() {
             {shortlink && copyButton}
         </Flex>
         <div align='left'>
-            {linkInfos}
+            {displayLinks}
         </div>
     </>
     )
