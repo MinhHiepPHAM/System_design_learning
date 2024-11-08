@@ -1,14 +1,13 @@
 import {
-    Box,
     Flex,
     Textarea,
     NumberInput,
     List,
-    Grid,
     Button,
     CopyButton,
     TextInput,
     Title,
+    Text,
 } from '@mantine/core';
 
 import { useEffect, useState } from 'react';
@@ -37,7 +36,7 @@ function Home() {
     },[shortlink]);
 
     const displayLinks = 
-    <Flex direction='column' mt='xl'>{
+    <Flex direction='column' mt='md'>{
         linkInfos.map((info,i) => (
             <a href={`/detail/${info.link}`} key={i}>{info.link}, created at {info.created}, size={info.size}</a>
     ))}
@@ -98,6 +97,10 @@ function Home() {
             {shortlink && copyButton}
         </Flex>
         <div align='left'>
+            <Flex direction='row' mt='xl'>
+                <Text size='lg' fw={500} c='blue' mr='xl'>Recent pastes</Text>
+                <a href={'/all'} style={{textDecoration: 'underline'}}>View all</a>
+            </Flex>
             {displayLinks}
         </div>
     </>
