@@ -1,4 +1,4 @@
-import os
+import os, math
 import psycopg2
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -112,4 +112,37 @@ def shortlink(shortlink):
         context = context, 
         size = get_file_size(pastepath)
     )
+
+@app.route('/all')
+def all_links():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute('SELECT COUNT(*) FROM pastes;')
+    total = cur.fetchone()[0]
+    
+    page_num = int(request.args.get('page',1))
+    page_size = 20
+    offset = (page_num-1) * page_size
+    
+    cur.execute(
+        'SELECT shortlink, created_at, pastepath FROM pastes ORDER BY id DESC '
+        'OFFSET %s LIMIT %s;', (offset,page_size)
+    )
+
+    link_infos = [{
+        'shortlink': shortlink,
+        'created_at': display_relative_time(created_at, datetime.datetime.now(datetime.timezone.utc)),
+        'size': get_file_size(pastepath)
+    }
+    for shortlink, created_at, pastepath in cur.fetchall()   
+    ]
+
+
+    cur.close()
+    conn.close()
+
+    return jsonify(link_infos=link_infos, num_page=math.ceil(total/page_size), status=201)
+
+
 
