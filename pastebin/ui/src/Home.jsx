@@ -36,11 +36,12 @@ function Home() {
 
     },[shortlink]);
 
-    const displayLinks = (<List mt='xl'>{
+    const displayLinks = 
+    <Flex direction='column' mt='xl'>{
         linkInfos.map((info,i) => (
-            <List.Item key={i}><a href={`/detail/${info.link}`}>{info.link}, created at {info.created}, size={info.size}</a></List.Item>
-        ))        
-    }</List>);
+            <a href={`/detail/${info.link}`} key={i}>{info.link}, created at {info.created}, size={info.size}</a>
+    ))}
+    </Flex>;
 
     const headers = {'Content-Type': 'application/json'};
 
