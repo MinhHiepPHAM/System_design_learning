@@ -6,11 +6,14 @@ from dotenv import load_dotenv
 import datetime
 from base62 import encode, decode
 from helper import display_relative_time, datetime_to_string, get_file_size
+from elastic import set_index, create_index
+from elasticsearch import Elasticsearch
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+es = Elasticsearch('http://localhost:9200', request_timeout=30)
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -44,6 +47,8 @@ def index():
         }
         for shortlink, created_at, pastepath in recent_links   
     ]
+
+   
 
 @app.route('/create/', methods=('POST',))
 def create():
@@ -82,6 +87,11 @@ def create():
 
     with open(pastepath, 'w') as filename:
         filename.write(paste_text)
+    
+    index_name = f'index_{id_base62}'
+    if not es.indices.exists(index=index_name):
+        create_index(es, index_name)
+    set_index(es, index_name, pastepath, paste_text)
 
     conn.commit()
     cur.close()
