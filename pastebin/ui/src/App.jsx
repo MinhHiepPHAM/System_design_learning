@@ -3,6 +3,7 @@ import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import Home from './Home'
 import ShortLink from './ShortLink'
 import AllLink from './AllLink'
+import AllSearchResults from './Search'
 import {DEFAULT_THEME, MantineProvider, createTheme, mergeThemeOverrides } from '@mantine/core';
 
 // Import styles of packages that you've installed.
@@ -31,6 +32,7 @@ function App() {
 							<Route path="/" element={<Home/>} />
                             <Route path="/detail/:shortlink" element={<ShortLink/>} />
                             <Route path="/all" element={<AllLink/>} />
+                            <Route path="/search/:query" element={<AllSearchResults/>} />
 						</Routes>
 					</main>
 				</div>

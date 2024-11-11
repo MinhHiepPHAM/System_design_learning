@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 
 import { useEffect, useState } from 'react';
-
+import { useNavigate } from "react-router-dom";
 
 import axios from 'axios';
 
@@ -20,6 +20,8 @@ function Home() {
     const [expiration, setExpiration] = useState(0);
     const [shortlink, setShortlink] = useState('');
     const [linkInfos, setLinkInfos] = useState([]);
+    const [query, setQuery] = useState("");
+    const navigate = useNavigate()
 
     useEffect(() => {
         async function fetchData() {
@@ -74,6 +76,17 @@ function Home() {
     return( 
     <>
         <a href='/'><Title c='blue' order={2}>Pastebin</Title></a>
+        <Flex direction='row' mt='xl'>
+            <TextInput
+                placeholder='Search created pastes'
+                onChange={(e)=>setQuery(e.currentTarget.value)}
+            />
+            <Button
+                fw='normal' ml='xs'
+                variant='outline'
+                onClick={(e)=> {navigate(`/search/${query}`)}}
+            >Search</Button>
+        </Flex>
         <Textarea
             label='New paste' required
             placeholder='Type the context you want to paste'
