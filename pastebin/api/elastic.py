@@ -18,3 +18,18 @@ def create_index(es, index_name):
     })
 
 
+def search(es, index_name, text):
+    search_query = {
+        "query": {
+            "match": {
+                "content": f"{text}"
+            }
+        }
+    }
+    for hit in es.search(index=index_name, body=search_query)["hits"]["hits"]:
+        yield hit["_source"]["filename"]
+
+    
+
+    
+

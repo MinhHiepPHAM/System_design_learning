@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import datetime
 from base62 import encode, decode
 from helper import display_relative_time, datetime_to_string, get_file_size
-from elastic import set_index, create_index
+from elastic import set_index, create_index, search
 from elasticsearch import Elasticsearch
 
 load_dotenv()
@@ -30,6 +30,7 @@ def get_db_connection():
 def index():
     conn = get_db_connection()
     cur = conn.cursor()
+
     # get recent links
     cur.execute(
         'SELECT shortlink, created_at, pastepath FROM pastes ORDER BY id DESC LIMIT 20;'
@@ -88,6 +89,8 @@ def create():
     with open(pastepath, 'w') as filename:
         filename.write(paste_text)
     
+    # use Elasticsearch to index the paste context to quickly find the path in
+    # search engine
     index_name = f'index_{id_base62}'
     if not es.indices.exists(index=index_name):
         create_index(es, index_name)
@@ -153,6 +156,40 @@ def all_links():
     conn.close()
 
     return jsonify(link_infos=link_infos, num_page=math.ceil(total/page_size), status=201)
+
+@app.route('/search/<query>')
+def search_result(query):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Better to use pagination to return the search result to limit the number
+    # of pastes. This code is only for testing the elastic searach, so I get
+    # all pastes in only one page
+    response = []
+    for filename in search(es, '*', query):
+        base62_str = filename.split('/')[-2]
+        id = decode(base62_str)
+        cur.execute(
+            'SELECT shortlink, created_at FROM pastes WHERE id=%s;', (id, )
+        )
+
+        shortlink, created_at = cur.fetchall()[0]
+        filename = os.path.join('pastepath', base62_str, 'path.txt')
+        with open(filename, 'r') as f:
+            paste_context = f.read()
+        response.append(
+            {
+                "shortlink": shortlink,
+                "created_at": display_relative_time(created_at, datetime.datetime.now(datetime.timezone.utc)),
+                'context': paste_context
+            }
+        )
+
+    return jsonify(results=response, status=201)
+
+
+
+
 
 
 
