@@ -23,4 +23,6 @@
 
 **All pages pagination**
 
-<img src="photos/al_paste.png"/>
+<img src="photos/all_paste.png"/>
+
+**TODO**: add paste context to AWS S3
